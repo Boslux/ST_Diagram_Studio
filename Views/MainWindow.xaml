@@ -1,0 +1,484 @@
+<Window x:Class="DiagramApp.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ST Diagram Studio"
+        Icon="pack://application:,,,/icon/nicon.ico"
+        Width="1420"
+        Height="860"
+        MinWidth="1120"
+        MinHeight="720"
+        WindowStartupLocation="CenterScreen"
+        Background="#0B1220"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        PreviewKeyDown="Window_PreviewKeyDown">
+    <Window.Resources>
+        <Style x:Key="PanelComboStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#E2E8F0"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="34"/>
+        </Style>
+
+        <Style x:Key="PanelComboItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+        </Style>
+
+        <Style x:Key="PanelTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#0E1629"/>
+            <Setter Property="Foreground" Value="#F1F5F9"/>
+        </Style>
+
+        <Style x:Key="PaletteItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="Background" Value="#1E293B"/>
+            <Setter Property="BorderBrush" Value="#334155"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#334155"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TopMenuStyle" TargetType="Menu">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+        </Style>
+
+        <Style x:Key="TopMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Foreground" Value="#E2E8F0"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#334155"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <DrawingBrush x:Key="WorkspaceGridBrush"
+                      TileMode="Tile"
+                      Viewport="0,0,24,24"
+                      ViewportUnits="Absolute"
+                      Stretch="None">
+            <DrawingBrush.Drawing>
+                <GeometryDrawing Brush="#0B162C">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,24,24"/>
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+            </DrawingBrush.Drawing>
+        </DrawingBrush>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop x:Name="RootGradientStartStop" Color="#0B1220" Offset="0"/>
+                <GradientStop x:Name="RootGradientEndStop" Color="#121A2F" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border x:Name="TopToolbarBorder"
+                Grid.Row="0"
+                Margin="20,20,20,12"
+                Padding="8,6"
+                CornerRadius="12"
+                Background="#172339"
+                BorderBrush="#23314B"
+                BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Menu x:Name="TopMainMenu" Grid.Column="0" Style="{StaticResource TopMenuStyle}">
+                    <MenuItem Header="File" Style="{StaticResource TopMenuItemStyle}">
+                        <MenuItem x:Name="NewProjectButton" Header="New Project" Click="NewProjectButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <MenuItem x:Name="OpenProjectButton" Header="Open Project..." Click="OpenProjectButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <Separator/>
+                        <MenuItem x:Name="SaveButton" Header="Save" Click="SaveButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <MenuItem x:Name="SaveAsButton" Header="Save As..." Click="SaveAsButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <Separator/>
+                        <MenuItem x:Name="ExportPngButton" Header="Export PNG" Click="ExportPngButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <Separator/>
+                        <MenuItem x:Name="UndoButton" Header="Undo" Click="UndoButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <MenuItem x:Name="RedoButton" Header="Redo" Click="RedoButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                    </MenuItem>
+
+                    <MenuItem Header="Settings" Style="{StaticResource TopMenuItemStyle}">
+                        <MenuItem Header="Theme" Style="{StaticResource TopMenuItemStyle}">
+                            <MenuItem x:Name="ThemeOceanMenuItem" Header="Ocean" Tag="Ocean" IsCheckable="True" Click="ThemeMenuItem_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                            <MenuItem x:Name="ThemeForestMenuItem" Header="Forest" Tag="Forest" IsCheckable="True" Click="ThemeMenuItem_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                            <MenuItem x:Name="ThemeSunsetMenuItem" Header="Sunset" Tag="Sunset" IsCheckable="True" Click="ThemeMenuItem_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem x:Name="SnapToGridCheckBox"
+                                  Header="Snap To Grid"
+                                  IsCheckable="True"
+                                  IsChecked="True"
+                                  Checked="SnapToGridCheckBox_Checked"
+                                  Unchecked="SnapToGridCheckBox_Checked"
+                                  Style="{StaticResource TopMenuItemStyle}"/>
+                        <MenuItem x:Name="FitViewButton" Header="Fit To View" Click="FitViewButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                        <MenuItem x:Name="AutoLayoutButton" Header="Auto Layout" Click="AutoLayoutButton_Click" Style="{StaticResource TopMenuItemStyle}"/>
+                    </MenuItem>
+                </Menu>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Zoom"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Center"
+                               Foreground="#CBD5E1"
+                               FontWeight="SemiBold"/>
+                    <Button x:Name="ZoomOutButton"
+                            Content="-"
+                            Width="28"
+                            Height="28"
+                            Margin="0,0,6,0"
+                            Click="ZoomOutButton_Click"
+                            Background="#475569"
+                            Foreground="#E2E8F0"
+                            BorderThickness="0"/>
+                    <Slider x:Name="ZoomSlider"
+                            Width="140"
+                            Minimum="25"
+                            Maximum="250"
+                            Value="100"
+                            TickFrequency="5"
+                            IsSnapToTickEnabled="False"
+                            VerticalAlignment="Center"
+                            ValueChanged="ZoomSlider_ValueChanged"/>
+                    <Button x:Name="ZoomInButton"
+                            Content="+"
+                            Width="28"
+                            Height="28"
+                            Margin="6,0,6,0"
+                            Click="ZoomInButton_Click"
+                            Background="#475569"
+                            Foreground="#E2E8F0"
+                            BorderThickness="0"/>
+                    <TextBlock x:Name="ZoomTextBlock"
+                               Width="56"
+                               VerticalAlignment="Center"
+                               Foreground="#CBD5E1"
+                               TextAlignment="Right"
+                               Text="100%"/>
+                </StackPanel>
+
+                <ComboBox x:Name="ThemeComboBox"
+                          Visibility="Collapsed"
+                          SelectionChanged="ThemeComboBox_SelectionChanged"
+                          Style="{StaticResource PanelComboStyle}"
+                          ItemContainerStyle="{StaticResource PanelComboItemStyle}">
+                    <ComboBoxItem Content="Ocean (Default)" Tag="Ocean"/>
+                    <ComboBoxItem Content="Forest" Tag="Forest"/>
+                    <ComboBoxItem Content="Sunset" Tag="Sunset"/>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="20,0,20,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="332"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="SidePanelBorder"
+                    Grid.Column="0"
+                    Margin="0,0,12,0"
+                    Padding="12"
+                    CornerRadius="16"
+                    Background="#18253B"
+                    BorderBrush="#23314B"
+                    BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Workspace Panel"
+                                   FontFamily="Segoe UI Variable Display"
+                                   FontSize="22"
+                                   FontWeight="SemiBold"
+                                   Foreground="#E2E8F0"/>
+                        <TextBlock x:Name="ProjectPathTextBlock"
+                                   Margin="0,6,0,12"
+                                   Text="Project: Untitled"
+                                   Foreground="#9FB1D1"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+
+                        <Border Margin="0,0,0,10"
+                                Padding="10"
+                                CornerRadius="10"
+                                Background="#142338"
+                                BorderBrush="#29405D"
+                                BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Create Node"
+                                           Foreground="#E2E8F0"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Margin="0,10,0,0" Text="Title" Foreground="#CBD5E1"/>
+                                <TextBox x:Name="NodeTitleTextBox"
+                                         Margin="0,6,0,8"
+                                         Style="{StaticResource PanelTextBoxStyle}"
+                                         Text="New Node"/>
+                                <TextBlock Text="Shape" Foreground="#CBD5E1"/>
+                                <ComboBox x:Name="NodeShapeComboBox"
+                                          Margin="0,6,0,8"
+                                          Style="{StaticResource PanelComboStyle}"
+                                          ItemContainerStyle="{StaticResource PanelComboItemStyle}">
+                                    <ComboBoxItem Content="Rectangle" Tag="Rectangle"/>
+                                    <ComboBoxItem Content="Ellipse" Tag="Ellipse"/>
+                                    <ComboBoxItem Content="Decision Diamond" Tag="DecisionDiamond"/>
+                                </ComboBox>
+                                <Button x:Name="AddNodeButton"
+                                        Content="Add Node"
+                                        Height="34"
+                                        Click="AddNodeButton_Click"
+                                        Background="#22C55E"
+                                        Foreground="#0F172A"
+                                        BorderThickness="0"
+                                        FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,0,0,10"
+                                Padding="10"
+                                CornerRadius="10"
+                                Background="#142338"
+                                BorderBrush="#29405D"
+                                BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Selected Node"
+                                           Foreground="#E2E8F0"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock x:Name="SelectedNodeTextBlock"
+                                           Margin="0,8,0,8"
+                                           Foreground="#93A4C5"
+                                           Text="(No node selected)"/>
+                                <TextBox x:Name="RenameNodeTextBox"
+                                         Margin="0,0,0,8"
+                                         Style="{StaticResource PanelTextBoxStyle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="RenameNodeButton"
+                                            Grid.Column="0"
+                                            Content="Rename"
+                                            Height="34"
+                                            Click="RenameNodeButton_Click"
+                                            Background="#38BDF8"
+                                            Foreground="#0B1220"
+                                            BorderThickness="0"/>
+                                    <Button x:Name="DeleteSelectedNodeButton"
+                                            Grid.Column="2"
+                                            Content="Delete"
+                                            Height="34"
+                                            Click="DeleteSelectedNodeButton_Click"
+                                            Background="#B91C1C"
+                                            Foreground="#FEE2E2"
+                                            BorderThickness="0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,0,0,10"
+                                Padding="10"
+                                CornerRadius="10"
+                                Background="#142338"
+                                BorderBrush="#29405D"
+                                BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Connections"
+                                           Foreground="#E2E8F0"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Margin="0,10,0,0" Text="From" Foreground="#CBD5E1"/>
+                                <ComboBox x:Name="FromNodeComboBox"
+                                          Margin="0,6,0,8"
+                                          SelectionChanged="NodeSelector_SelectionChanged"
+                                          Style="{StaticResource PanelComboStyle}"
+                                          ItemContainerStyle="{StaticResource PanelComboItemStyle}"/>
+                                <TextBlock Text="To" Foreground="#CBD5E1"/>
+                                <ComboBox x:Name="ToNodeComboBox"
+                                          Margin="0,6,0,8"
+                                          SelectionChanged="NodeSelector_SelectionChanged"
+                                          Style="{StaticResource PanelComboStyle}"
+                                          ItemContainerStyle="{StaticResource PanelComboItemStyle}"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="ConnectButton"
+                                            Grid.Column="0"
+                                            Content="Connect"
+                                            Height="34"
+                                            Click="ConnectButton_Click"
+                                            Background="#0EA5E9"
+                                            Foreground="#0B1220"
+                                            BorderThickness="0"
+                                            FontWeight="SemiBold"/>
+                                    <Button x:Name="RemoveEdgeButton"
+                                            Grid.Column="2"
+                                            Content="Remove"
+                                            Height="34"
+                                            Click="RemoveEdgeButton_Click"
+                                            Background="#991B1B"
+                                            Foreground="#FEE2E2"
+                                            BorderThickness="0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Margin="0,0,0,10"
+                                Padding="10"
+                                CornerRadius="10"
+                                Background="#142338"
+                                BorderBrush="#29405D"
+                                BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Quick Shapes (Drag to Canvas)"
+                                           Foreground="#E2E8F0"
+                                           FontWeight="SemiBold"/>
+                                <ListBox x:Name="ShapePaletteListBox"
+                                         Margin="0,10,0,0"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         PreviewMouseMove="ShapePaletteListBox_PreviewMouseMove"
+                                         SelectionMode="Single"
+                                         ItemContainerStyle="{StaticResource PaletteItemStyle}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    <ListBoxItem Tag="Rectangle" Content="Rectangle"/>
+                                    <ListBoxItem Tag="Ellipse" Content="Ellipse"/>
+                                    <ListBoxItem Tag="DecisionDiamond" Content="Decision"/>
+                                </ListBox>
+                            </StackPanel>
+                        </Border>
+
+                        <Button x:Name="ClearButton"
+                                Content="Clear Canvas"
+                                Height="34"
+                                Click="ClearButton_Click"
+                                Background="#7F1D1D"
+                                Foreground="#FEE2E2"
+                                BorderThickness="0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border x:Name="CanvasHostBorder"
+                    Grid.Column="1"
+                    CornerRadius="16"
+                    BorderBrush="#22304A"
+                    BorderThickness="1"
+                    Background="#0D1527">
+                <Grid>
+                    <ScrollViewer x:Name="WorkspaceScrollViewer"
+                                  Margin="12"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  CanContentScroll="False"
+                                  PreviewMouseWheel="WorkspaceScrollViewer_PreviewMouseWheel"
+                                  PreviewMouseDown="WorkspaceScrollViewer_PreviewMouseDown"
+                                  PreviewMouseMove="WorkspaceScrollViewer_PreviewMouseMove"
+                                  PreviewMouseUp="WorkspaceScrollViewer_PreviewMouseUp"
+                                  MouseLeave="WorkspaceScrollViewer_MouseLeave">
+                        <Grid x:Name="WorkspaceSurface" Width="2500" Height="1600">
+                            <Grid.LayoutTransform>
+                                <ScaleTransform x:Name="WorkspaceScaleTransform" ScaleX="1" ScaleY="1"/>
+                            </Grid.LayoutTransform>
+                            <Rectangle x:Name="WorkspaceGridRect" Width="2500" Height="1600" Fill="{StaticResource WorkspaceGridBrush}"/>
+                            <Canvas x:Name="DiagramCanvas"
+                                    Width="2500"
+                                    Height="1600"
+                                    Background="Transparent"
+                                    AllowDrop="True"
+                                    DragOver="DiagramCanvas_DragOver"
+                                    Drop="DiagramCanvas_Drop"
+                                    MouseMove="DiagramCanvas_OnMouseMove"
+                                    MouseLeftButtonUp="DiagramCanvas_OnMouseLeftButtonUp"
+                                    MouseLeftButtonDown="DiagramCanvas_OnMouseLeftButtonDown"/>
+                        </Grid>
+                    </ScrollViewer>
+                    <TextBlock x:Name="EmptyStateText"
+                               Text="Drag a shape from the left panel to start"
+                               Foreground="#64748B"
+                               FontSize="22"
+                               FontFamily="Segoe UI Variable Display"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               IsHitTestVisible="False"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <StatusBar x:Name="BottomStatusBar"
+                   Grid.Row="2"
+                   Margin="20,0,20,20"
+                   Padding="10,4"
+                   Background="#111B2F"
+                   Foreground="#CBD5E1"
+                   BorderBrush="#23314B"
+                   BorderThickness="1">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusTextBlock" Text="Ready"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <TextBlock x:Name="AutosaveStatusTextBlock" Text="Autosave: Idle"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock x:Name="RenderPerfTextBlock" Text="Render: -"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <Image Width="18"
+                       Height="18"
+                       Margin="2,0,0,0"
+                       Source="pack://application:,,,/icon/nicon.ico"
+                       Stretch="Uniform"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

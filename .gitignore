@@ -1,0 +1,64 @@
+## Build artifacts
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+## IDE/editor metadata
+.vscode/
+.idea/
+
+## Logs/temp
+logs/
+*.log
+*.tmp
+*.temp
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Sensitive local folders
+Private/
+Secrets/
+
+## Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+## Local configuration/secrets
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+secrets.*.json
+*.secret
+*.secrets.json
+
+## Certificates and keys
+*.key
+*.pem
+*.pfx
+*.p12
+*.jks
+*.keystore
+*.crt
+*.cer
+id_rsa
+id_rsa.pub
+
+## Cloud credentials
+.aws/
+.azure/
+.gcp/
+
+## Personal documents
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.pdf
