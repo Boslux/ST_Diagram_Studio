@@ -77,6 +77,7 @@ public partial class MainWindow
         {
             SelectedNodeTextBlock.Text = "(No node selected)";
             RenameNodeTextBox.Text = string.Empty;
+            RenameNodeDescriptionTextBox.Text = string.Empty;
             RenameNodeButton.IsEnabled = false;
             RenameNodeButton.Opacity = 0.55;
             DeleteSelectedNodeButton.IsEnabled = false;
@@ -94,6 +95,7 @@ public partial class MainWindow
 
         SelectedNodeTextBlock.Text = $"{node.Id} - {node.Title} ({node.ShapeType})";
         RenameNodeTextBox.Text = node.Title;
+        RenameNodeDescriptionTextBox.Text = node.Description;
         RenameNodeButton.IsEnabled = true;
         RenameNodeButton.Opacity = 1;
         DeleteSelectedNodeButton.IsEnabled = true;
@@ -403,7 +405,7 @@ public partial class MainWindow
             return;
         }
 
-        _clipboardNode = new NodeClipboardData(node.Title, node.ShapeType, node.X, node.Y);
+        _clipboardNode = new NodeClipboardData(node.Title, node.Description, node.ShapeType, node.X, node.Y);
         _pasteOffsetStep = 0;
         StatusTextBlock.Text = $"{node.Id} copied to clipboard.";
     }
@@ -439,7 +441,7 @@ public partial class MainWindow
         }
 
         var title = _clipboardNode.Title + " Copy";
-        var node = _diagram.AddNode(title, Math.Max(10, x), Math.Max(10, y), _clipboardNode.ShapeType);
+        var node = _diagram.AddNode(title, Math.Max(10, x), Math.Max(10, y), _clipboardNode.ShapeType, _clipboardNode.Description);
         NormalizeNodeToWorkspace(node);
 
         RefreshNodeSelectors();

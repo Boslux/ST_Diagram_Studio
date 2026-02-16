@@ -19,10 +19,10 @@ internal sealed class DiagramModel
     /// <summary>
     /// Yeni bir dugum ekler ve otomatik id atar.
     /// </summary>
-    public DiagramNode AddNode(string title, double x, double y, NodeShapeType shapeType = NodeShapeType.Rectangle)
+    public DiagramNode AddNode(string title, double x, double y, NodeShapeType shapeType = NodeShapeType.Rectangle, string? description = null)
     {
         var id = CreateId();
-        var node = new DiagramNode(id, title, x, y, shapeType);
+        var node = new DiagramNode(id, title, x, y, shapeType, description);
         _nodes[id] = node;
         return node;
     }
@@ -120,6 +120,7 @@ internal sealed class DiagramModel
                 {
                     Id = n.Id,
                     Title = n.Title,
+                    Description = n.Description,
                     X = n.X,
                     Y = n.Y,
                     ShapeType = n.ShapeType.ToString()
@@ -160,7 +161,8 @@ internal sealed class DiagramModel
                 node.Title ?? "New Node",
                 node.X,
                 node.Y,
-                ParseShapeType(node.ShapeType));
+                ParseShapeType(node.ShapeType),
+                node.Description);
         }
 
         foreach (var edge in project.Edges)

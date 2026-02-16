@@ -311,6 +311,9 @@ public partial class MainWindow
 
         };
 
+        ToolTipService.SetShowDuration(root, 60000);
+        root.ToolTip = BuildNodeToolTip(node);
+
 
 
         root.Children.Add(BuildNodeShape(node.ShapeType, border, borderThickness));
@@ -362,6 +365,90 @@ public partial class MainWindow
         root.MouseRightButtonUp += NodeCard_MouseRightButtonUp;
 
         return root;
+
+    }
+
+
+
+    private FrameworkElement BuildNodeToolTip(DiagramNode node)
+
+    {
+
+        var description = string.IsNullOrWhiteSpace(node.Description) ? "Aciklama yok." : node.Description;
+
+        var panel = new StackPanel
+
+        {
+
+            MaxWidth = 360
+
+        };
+
+
+
+        panel.Children.Add(new TextBlock
+
+        {
+
+            Text = $"{node.Id} - {node.Title}",
+
+            FontWeight = FontWeights.SemiBold,
+
+            Foreground = Brushes.White
+
+        });
+
+
+
+        panel.Children.Add(new TextBlock
+
+        {
+
+            Margin = new Thickness(0, 4, 0, 0),
+
+            Text = $"Tip: {node.ShapeType} | Konum: ({node.X:0}, {node.Y:0})",
+
+            Foreground = new SolidColorBrush(Color.FromRgb(203, 213, 225)),
+
+            FontSize = 12
+
+        });
+
+
+
+        panel.Children.Add(new TextBlock
+
+        {
+
+            Margin = new Thickness(0, 8, 0, 0),
+
+            Text = description,
+
+            TextWrapping = TextWrapping.Wrap,
+
+            Foreground = new SolidColorBrush(Color.FromRgb(226, 232, 240))
+
+        });
+
+
+
+        return new Border
+
+        {
+
+            Padding = new Thickness(10, 8, 10, 8),
+
+            Background = new SolidColorBrush(Color.FromRgb(15, 23, 42)),
+
+            BorderBrush = new SolidColorBrush(Color.FromRgb(51, 65, 85)),
+
+            BorderThickness = new Thickness(1),
+
+            CornerRadius = new CornerRadius(8),
+
+            Child = panel
+
+        };
 
     }
 
@@ -504,6 +591,32 @@ public partial class MainWindow
             TextTrimming = TextTrimming.CharacterEllipsis
 
         });
+
+        if (!string.IsNullOrWhiteSpace(node.Description))
+
+        {
+
+            panel.Children.Add(new TextBlock
+
+            {
+
+                Text = node.Description,
+
+                Margin = new Thickness(0, 4, 0, 0),
+
+                FontSize = 11,
+
+                Foreground = _nodeHeaderBrush,
+
+                TextAlignment = TextAlignment.Center,
+
+                TextWrapping = TextWrapping.NoWrap,
+
+                TextTrimming = TextTrimming.CharacterEllipsis
+
+            });
+
+        }
 
 
 

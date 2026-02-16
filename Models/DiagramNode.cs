@@ -7,10 +7,11 @@ namespace DiagramApp.Models;
 /// </summary>
 internal sealed class DiagramNode
 {
-    public DiagramNode(string id, string title, double x, double y, NodeShapeType shapeType = NodeShapeType.Rectangle)
+    public DiagramNode(string id, string title, double x, double y, NodeShapeType shapeType = NodeShapeType.Rectangle, string? description = null)
     {
         Id = id;
         Title = title;
+        Description = string.IsNullOrWhiteSpace(description) ? string.Empty : description.Trim();
         X = x;
         Y = y;
         ShapeType = shapeType;
@@ -25,6 +26,11 @@ internal sealed class DiagramNode
     /// Dugum basligi.
     /// </summary>
     public string Title { get; set; }
+
+    /// <summary>
+    /// Dugum aciklamasi.
+    /// </summary>
+    public string Description { get; set; }
 
     /// <summary>
     /// Canvas X koordinati.

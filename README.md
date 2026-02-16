@@ -1,6 +1,5 @@
 # ST Diagram Studio
 
-Modern, gelistirilebilir bir WPF diagram editor prototipi.
 
 ## Proje Yapisi
 
@@ -38,6 +37,13 @@ Modern, gelistirilebilir bir WPF diagram editor prototipi.
 dotnet build
 dotnet run
 ```
+
+## Node Aciklamalari
+
+- Her node icin `Description` alani desteklenir.
+- Sol panelde `Create Node` ve `Selected Node` bolumlerinden aciklama ekleyebilir/guncelleyebilirsiniz.
+- Node uzerine gelince detayli aciklama tooltip olarak gosterilir.
+- `Add Node` ile eklenen yeni node'lar aktif gorunen calisma alaninda olusturulur.
 
 ## Guvenlik ve Git Ignore
 

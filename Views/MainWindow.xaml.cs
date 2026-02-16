@@ -136,7 +136,6 @@ public partial class MainWindow : Window
     {
         _autosaveTimer.Tick -= AutosaveTimer_Tick;
         _autosaveTimer.Stop();
-
         if (_isPanning)
         {
             EndPan();
@@ -550,7 +549,7 @@ public partial class MainWindow : Window
             _ => "Rectangle Node"
         };
 
-        var node = _diagram.AddNode(title, x, y, shapeType);
+        var node = _diagram.AddNode(title, x, y, shapeType, description: string.Empty);
         NormalizeNodeToWorkspace(node);
 
         RefreshNodeSelectors();
@@ -565,13 +564,15 @@ public partial class MainWindow : Window
         CommitInlineEditIfAny();
 
         var title = string.IsNullOrWhiteSpace(NodeTitleTextBox.Text) ? "New Node" : NodeTitleTextBox.Text.Trim();
+        var description = NormalizeDescription(NodeDescriptionTextBox.Text);
         var shapeType = GetSelectedCreateShapeType();
         var pos = NextNodePosition();
 
-        var node = _diagram.AddNode(title, pos.X, pos.Y, shapeType);
+        var node = _diagram.AddNode(title, pos.X, pos.Y, shapeType, description);
         NormalizeNodeToWorkspace(node);
 
         NodeTitleTextBox.Text = string.Empty;
+        NodeDescriptionTextBox.Text = string.Empty;
         RefreshNodeSelectors();
         SelectNode(node.Id, reRender: false);
         RenderDiagram();
@@ -596,16 +597,19 @@ public partial class MainWindow : Window
         }
 
         var newTitle = string.IsNullOrWhiteSpace(RenameNodeTextBox.Text) ? node.Title : RenameNodeTextBox.Text.Trim();
-        if (string.Equals(node.Title, newTitle, StringComparison.Ordinal))
+        var newDescription = NormalizeDescription(RenameNodeDescriptionTextBox.Text);
+        if (string.Equals(node.Title, newTitle, StringComparison.Ordinal) &&
+            string.Equals(node.Description, newDescription, StringComparison.Ordinal))
         {
-            StatusTextBlock.Text = "Node name is already the same.";
+            StatusTextBlock.Text = "Node details are already the same.";
             return;
         }
 
         node.Title = newTitle;
+        node.Description = newDescription;
         RenderDiagram();
         UpdateSelectionPanel();
-        CommitState($"{node.Id} renamed.");
+        CommitState($"{node.Id} details updated.");
     }
 
     private void DeleteSelectedNodeButton_Click(object sender, RoutedEventArgs e)
@@ -862,6 +866,11 @@ public partial class MainWindow : Window
             : NodeShapeType.Rectangle;
     }
 
+    private static string NormalizeDescription(string? description)
+    {
+        return string.IsNullOrWhiteSpace(description) ? string.Empty : description.Trim();
+    }
+
     private void SetZoomScale(double scale, bool syncSlider = true)
     {
         _zoomScale = Math.Clamp(scale, 0.25, 2.5);
@@ -905,16 +914,32 @@ public partial class MainWindow : Window
 
     private Point NextNodePosition()
     {
-        var spacingX = NodeWidth + 40;
-        var spacingY = NodeHeight + 64;
+        var viewport = GetVisibleWorkspaceBounds();
 
-        var columns = Math.Max(1, (int)((_workspaceWidth - 80) / spacingX));
-        var count = _diagram.Nodes.Count;
-        var col = count % columns;
-        var row = count / columns;
+        var minX = Math.Max(10, viewport.X + 20);
+        var minY = Math.Max(10, viewport.Y + 20);
+        var maxX = Math.Max(minX, Math.Min(_workspaceWidth - NodeWidth - 10, viewport.Right - NodeWidth - 20));
+        var maxY = Math.Max(minY, Math.Min(_workspaceHeight - NodeHeight - 10, viewport.Bottom - NodeHeight - 20));
 
-        var x = 40 + col * spacingX;
-        var y = 40 + row * spacingY;
+        var centerX = minX + (maxX - minX) / 2.0;
+        var centerY = minY + (maxY - minY) / 2.0;
+
+        var offsets = new[]
+        {
+            new Point(0, 0),
+            new Point(1, 0),
+            new Point(-1, 0),
+            new Point(0, 1),
+            new Point(0, -1),
+            new Point(1, 1),
+            new Point(-1, 1),
+            new Point(1, -1),
+            new Point(-1, -1)
+        };
+
+        var offset = offsets[_diagram.Nodes.Count % offsets.Length];
+        var x = centerX + offset.X * 32;
+        var y = centerY + offset.Y * 26;
 
         if (IsSnapEnabled())
         {
@@ -922,8 +947,29 @@ public partial class MainWindow : Window
             y = SnapCoordinate(y);
         }
 
-        EnsureWorkspaceForBounds(x, y, NodeWidth, NodeHeight);
+        x = Math.Clamp(x, minX, maxX);
+        y = Math.Clamp(y, minY, maxY);
         return new Point(x, y);
+    }
+
+    private Rect GetVisibleWorkspaceBounds()
+    {
+        var scale = Math.Max(0.001, _zoomScale);
+        var viewportWidth = WorkspaceScrollViewer.ViewportWidth / scale;
+        var viewportHeight = WorkspaceScrollViewer.ViewportHeight / scale;
+
+        if (viewportWidth <= 1 || viewportHeight <= 1)
+        {
+            return new Rect(0, 0, _workspaceWidth, _workspaceHeight);
+        }
+
+        var x = WorkspaceScrollViewer.HorizontalOffset / scale;
+        var y = WorkspaceScrollViewer.VerticalOffset / scale;
+
+        x = Math.Clamp(x, 0, Math.Max(0, _workspaceWidth - viewportWidth));
+        y = Math.Clamp(y, 0, Math.Max(0, _workspaceHeight - viewportHeight));
+
+        return new Rect(x, y, Math.Min(viewportWidth, _workspaceWidth), Math.Min(viewportHeight, _workspaceHeight));
     }
 
     private double SnapCoordinate(double value)
@@ -1004,7 +1050,7 @@ public partial class MainWindow : Window
         return new Point(center.X + dx * factor, center.Y + dy * factor);
     }
 
-    private sealed record NodeClipboardData(string Title, NodeShapeType ShapeType, double X, double Y);
+    private sealed record NodeClipboardData(string Title, string Description, NodeShapeType ShapeType, double X, double Y);
 
     private sealed record ThemePalette(
         Color GradientStart,

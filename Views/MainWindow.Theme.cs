@@ -37,8 +37,12 @@ public partial class MainWindow
 
         NodeTitleTextBox.Background = new SolidColorBrush(palette.InputBackground);
         NodeTitleTextBox.Foreground = new SolidColorBrush(palette.InputForeground);
+        NodeDescriptionTextBox.Background = new SolidColorBrush(palette.InputBackground);
+        NodeDescriptionTextBox.Foreground = new SolidColorBrush(palette.InputForeground);
         RenameNodeTextBox.Background = new SolidColorBrush(palette.InputBackground);
         RenameNodeTextBox.Foreground = new SolidColorBrush(palette.InputForeground);
+        RenameNodeDescriptionTextBox.Background = new SolidColorBrush(palette.InputBackground);
+        RenameNodeDescriptionTextBox.Foreground = new SolidColorBrush(palette.InputForeground);
 
         FromNodeComboBox.Background = new SolidColorBrush(palette.SelectorBackground);
         FromNodeComboBox.Foreground = panelForeground;

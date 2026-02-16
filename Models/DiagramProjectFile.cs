@@ -19,6 +19,7 @@ internal sealed class DiagramNodeFile
 {
     public string Id { get; set; } = string.Empty;
     public string? Title { get; set; }
+    public string? Description { get; set; }
     public double X { get; set; }
     public double Y { get; set; }
     public string ShapeType { get; set; } = nameof(NodeShapeType.Rectangle);

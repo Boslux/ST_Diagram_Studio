@@ -254,6 +254,14 @@
                                          Margin="0,6,0,8"
                                          Style="{StaticResource PanelTextBoxStyle}"
                                          Text="New Node"/>
+                                <TextBlock Text="Description" Foreground="#CBD5E1"/>
+                                <TextBox x:Name="NodeDescriptionTextBox"
+                                         Margin="0,6,0,8"
+                                         Height="72"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
+                                         Style="{StaticResource PanelTextBoxStyle}"/>
                                 <TextBlock Text="Shape" Foreground="#CBD5E1"/>
                                 <ComboBox x:Name="NodeShapeComboBox"
                                           Margin="0,6,0,8"
@@ -288,8 +296,17 @@
                                            Margin="0,8,0,8"
                                            Foreground="#93A4C5"
                                            Text="(No node selected)"/>
+                                <TextBlock Text="Title" Foreground="#CBD5E1"/>
                                 <TextBox x:Name="RenameNodeTextBox"
-                                         Margin="0,0,0,8"
+                                         Margin="0,6,0,8"
+                                         Style="{StaticResource PanelTextBoxStyle}"/>
+                                <TextBlock Text="Description" Foreground="#CBD5E1"/>
+                                <TextBox x:Name="RenameNodeDescriptionTextBox"
+                                         Margin="0,6,0,8"
+                                         Height="72"
+                                         AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto"
                                          Style="{StaticResource PanelTextBoxStyle}"/>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -299,7 +316,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Button x:Name="RenameNodeButton"
                                             Grid.Column="0"
-                                            Content="Rename"
+                                            Content="Update"
                                             Height="34"
                                             Click="RenameNodeButton_Click"
                                             Background="#38BDF8"
